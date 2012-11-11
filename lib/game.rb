@@ -45,8 +45,9 @@ class Game
       if !piece.zero? && (piece.name == "king")
         @game_over = true
       end
+      moving_piece = @board.pieces[from[0]][from[1]]
       update_board(from, to)
-      @board.pieces[to[0]][to[1]].move
+      moving_piece.move
       return true
     end
   end
