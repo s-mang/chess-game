@@ -22,28 +22,20 @@ describe Game do
   context '#make_move' do
     let!(:pawn) { game.board.pieces[1][5] }
     
-    it "will not make a move off the board" do
-      game.stub(:get_errors_for_move).with([1,3], [-2,5], game.board, FIRST_PLAYER).and_return("This is an error message")
-      game.make_move([1,3], [-2,5]).should be_false
+    def stub_methods_and_call_make_move(from, to, player, stub_returns = {})
+      game.stub(:get_errors_for_move).with(from, to, game.board, player).and_return(stub_returns[:first])
+      game.stub(:make_captures).with(to).and_return(stub_returns[:second]) unless stub_returns[:second].nil?
+      game.make_move(from, to)
     end
-    
-    it "should update board pieces after move" do
-      game.stub(:get_errors_for_move).with([1,1], [2,1], game.board, FIRST_PLAYER)
-      game.stub(:make_captures).with([2,1]).and_return(0)
-      game.make_move([1,1], [2,1]).should be_true
-    end
-    
-    it "should update update moved piece to 'moved'" do
-      game.stub(:get_errors_for_move).with([1,5], [2,1], game.board, FIRST_PLAYER)
-      game.stub(:make_captures).with([2,1]).and_return(0)
-      expect { game.make_move([1,5], [2,1]) }.to change { pawn.has_moved }.from(false).to(true)
-    end
-        
+          
+    it { stub_methods_and_call_make_move([1,3], [-2,5], FIRST_PLAYER, { :first => "This is an error message" }).should be_false }   
+    it { stub_methods_and_call_make_move([1,1], [2,1], FIRST_PLAYER, { :second => 0 }).should be_true }    
+    it { expect { stub_methods_and_call_make_move([1,5], [2,1], FIRST_PLAYER, { :second => 0 }) }.
+        to change { pawn.has_moved? }.from(false).to(true) }
+           
     ## END GAME?
-    it "sets @game_over to true when king is captured" do
-      game.stub(:get_errors_for_move)
-      expect { game.make_move([1,1], [SECOND_PLAYER[:owns][:back_row], PIECES[:back_row].index("king")]) }.to change {game.game_over}.from(false).to(true)
-    end
+    it { expect { stub_methods_and_call_make_move([1,1], [SECOND_PLAYER[:owns][:back_row], PIECES[:back_row].index("king")], FIRST_PLAYER) }.
+        to change { game.game_over? }.from(false).to(true) }
   end
   
   ## UPDATE BOARD

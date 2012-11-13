@@ -16,9 +16,13 @@ class Game
     @second_player_captured_pieces = []
   end
   
+  def game_over?
+    @game_over
+  end
+  
   # CAPTURES & RETURNS CAPTURED PIECE BY CURRENT_PLAYER
   def make_captures(to)
-    unless (piece = @board.pieces[to[0]][to[1]]).zero? 
+    unless (piece = @board.piece_at(to)).zero? 
       if (@current_player == FIRST_PLAYER)
         @first_player_captured_pieces << piece
       else
@@ -30,8 +34,8 @@ class Game
   
   # CHANGE POSITION OF (FROM) PIECE TO (TO)
   def update_board(from, to)
-    @board.pieces[to[0]][to[1]] = @board.pieces[from[0]][from[1]]
-    @board.pieces[from[0]][from[1]] = 0
+    @board.set_piece(to, @board.piece_at(from))
+    @board.set_piece(from, 0)
   end
   
   # CONTROLLS MOVE-MAKING & CHECKS FOR GAME OVER
@@ -45,9 +49,9 @@ class Game
       if !piece.zero? && (piece.name == "king")
         @game_over = true
       end
-      moving_piece = @board.pieces[from[0]][from[1]]
+      moving_piece = @board.piece_at(from)
       update_board(from, to)
-      moving_piece.move
+      @board.set_piece_as_moved(moving_piece)
       return true
     end
   end

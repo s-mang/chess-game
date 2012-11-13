@@ -9,6 +9,6 @@ describe Piece do
   it { piece.has_moved.should be_false }
 
   ## MOVE PIECE:
-  it { expect { piece.move }.to change { piece.has_moved }.from(false).to(true) }
+  it { expect { piece.set_as_moved }.to change { piece.has_moved }.from(false).to(true) }
   
 end

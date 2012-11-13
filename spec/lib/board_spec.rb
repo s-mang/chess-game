@@ -27,11 +27,30 @@ describe Board do
   end
   
   
-  # PIECE_AT?: 
   context '#piece_at?' do 
-    it { board.piece_at?(FIRST_PLAYER[:owns][:back_row],0).should be_true }  
-    it { board.piece_at?((XMAX/2).round, 0).should be_false }
+    it { board.piece_at?([FIRST_PLAYER[:owns][:back_row],0]).should be_true }  
+    it { board.piece_at?([(XMAX/2).round, 0]).should be_false }
   end
+  
+  context '#piece_at' do
+    it { board.piece_at([0,0]).should be_an_instance_of(Piece) }
+  end
+  
+  context '#set_piece' do
+    let!(:piece) { Piece.new("king", "white") }
+    it { expect { board.set_piece([0,0], piece) }.to change { board.piece_at([0,0]) }.to(piece) }
+  end
+  
+  context '#set_piece_as_moved' do
+    let(:piece) { Piece.new("king", "white", false) }
+    it { expect { board.set_piece_as_moved(piece) }.to change { piece.has_moved? }.to(true) }
+  end
+  
+  context '#set_piece_as_unmoved' do
+    let(:piece) { Piece.new("king", "white", true) }
+    it { expect { board.set_piece_as_unmoved(piece) }.to change { piece.has_moved? }.to(false) }
+  end
+  
 
     
    

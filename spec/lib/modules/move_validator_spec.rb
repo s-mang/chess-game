@@ -25,18 +25,14 @@ describe MoveValidator do
 
   # Total distance
   context '#total_dist' do
-    it "should know diagonal distances" do
-      dummy.stub(:x_and_y_distances).and_return([2,2])
-      dummy.total_dist([1,1], [3,3]).should == 2 
+    def stub_methods_and_call_total_dist(from, to, stub_return)
+      dummy.stub(:x_and_y_distances).with(from, to).and_return(stub_return)
+      dummy.total_dist(from, to)
     end
-    it "should know non-straight distances" do
-      dummy.stub(:x_and_y_distances).and_return([2,1])
-      dummy.total_dist([1,1], [3,2]).should == -1
-    end
-    it "should know horizontal/vertical distances" do
-      dummy.stub(:x_and_y_distances).and_return([0,2])
-      dummy.total_dist([1,1], [1,3]).should == 2
-    end
+    
+    it { stub_methods_and_call_total_dist([1,1], [3,3], [2,2]).should == 2 }
+    it { stub_methods_and_call_total_dist([1,1], [3,2], [2,1]).should == -1 }
+    it { stub_methods_and_call_total_dist([1,1], [1,3], [0,2]).should == 2 }
   end
 
   # Forward paths
@@ -48,114 +44,91 @@ describe MoveValidator do
 
   # Perpendicular paths
   context '#is_perpendicular_path?' do
-    it "should recognize x-axis only path as perpendicular" do
-      dummy.stub(:is_non_stationary_path?).with([1,1], [4,1]).and_return(true)
-      dummy.stub(:x_and_y_distances).with([1,1], [4,1]).and_return([3,0])
-      dummy.is_perpendicular_path?([1,1], [4,1]).should be_true
+    def stub_methods_and_call_is_perp_path(from, to, stub_return)
+      dummy.stub_chain(:is_non_stationary_path?, :x_and_y_distances).with(from, to).and_return(stub_return)
+      dummy.is_perpendicular_path?(from, to)
     end
-    it "should recognize L path is not perpendicular" do
-      dummy.stub(:is_non_stationary_path?).with([1,1], [3,2]).and_return(true)
-      dummy.stub(:x_and_y_distances).with([1,1], [3,2]).and_return([2,1])
-      dummy.is_perpendicular_path?([1,1], [3,2]).should be_false
-    end
+      
+    it { stub_methods_and_call_is_perp_path([1,1], [4,1], [3,0]).should be_true }
+    it { stub_methods_and_call_is_perp_path([1,1], [3,2], [2,1]).should be_false }
   end
 
   # L paths
   context '#is_L_path?' do
-    it "should recogize a non-L path" do
-      dummy.stub(:x_and_y_distances).with([1,1], [3,5]).and_return([2,4])    
-      dummy.is_L_path?([1,1], [3,5]).should be_false
-    end 
-    it "should recognize an L path" do
-      dummy.stub(:x_and_y_distances).with([1,1], [3,2]).and_return([2,1])  
-      dummy.is_L_path?([1,1], [3,2]).should be_true
+    def stub_methods_and_call_is_L_path(from, to, stub_return)
+      dummy.stub(:x_and_y_distances).with(from, to).and_return(stub_return)
+      dummy.is_L_path?(from, to)
     end
+    
+    it { stub_methods_and_call_is_L_path([1,1], [3,5], [2,4]).should be_false }
+    it { stub_methods_and_call_is_L_path([1,1], [3,2], [2,1]).should be_true }
   end
 
   # Diagonal paths
   context '#is_diagonal_path?' do
-    it "should recognize a non-diagonal path" do
-      dummy.stub(:x_and_y_distances).with([1,1], [3,2]).and_return([2,1])  
-      dummy.is_diagonal_path?([1,1], [3,2]).should be_false 
+    def stub_methods_and_call_is_diagonal_path(from, to, stub_return)
+      dummy.stub(:x_and_y_distances).with(from, to).and_return(stub_return)
+      dummy.is_diagonal_path?(from, to)
     end
-    it "should recognize a diagonal path" do
-      dummy.stub(:x_and_y_distances).with([1,1], [3,3]).and_return([2,2])  
-      dummy.is_diagonal_path?([1,1], [3,3]).should be_true
-    end
+    
+    it { stub_methods_and_call_is_diagonal_path([1,1], [3,2], [2,1]).should be_false }
+    it { stub_methods_and_call_is_diagonal_path([1,1], [3,3], [2,2]).should be_true }
   end
 
   # Get squares between from and to (get path squares)
   context '#get_path_squares' do
-    it "should return propper path squares" do
-      dummy.stub(:x_and_y_distances).with([1,1], [3,3]).and_return([2,2])
-      dummy.stub(:is_diagonal_path?).with([1,1], [3,3]).and_return(true)
-      dummy.get_path_squares([1,1], [3,3]).should == [[2,2]]
+    def stub_methods_and_call_get_path_squares(from, to, stub_return_1, stub_return_2)
+      dummy.stub(:x_and_y_distances).with(from, to).and_return(stub_return_1)
+      dummy.stub(:is_diagonal_path?).with(from, to).and_return(stub_return_2)
+      dummy.get_path_squares(from, to)
     end
+    
+    it { stub_methods_and_call_get_path_squares([1,1],[3,3],[2,2], true).should == [[2,2]]}
   end
 
   # Vacant paths
   context '#is_vacant_path?' do
-    it "should recognize vacant path" do
-      dummy.stub(:is_straight_path?).with([3,0], [5,0]).and_return(true)
-      dummy.stub(:get_path_squares).with([3,0], [5,0]).and_return([[2,2]])
-      dummy.is_vacant_path?([3,0], [5,0], game.board).should be_true
+    def stub_methods_and_call_is_vacant_path(from, to, stub_return)
+      dummy.stub_chain(:is_straight_path?, :get_path_squares).with(from, to).and_return(stub_return)
+      dummy.is_vacant_path?(from, to, game.board)
     end
-    it "should recognize non-vacant path" do
-      dummy.stub(:is_straight_path?).with([0,0], [0,2]).and_return(true)
-      dummy.stub(:get_path_squares).with([0,0], [0,2]).and_return([[0,1]])
-      dummy.is_vacant_path?([0,0], [0,2], game.board).should be_false
-    end
+    
+    it { stub_methods_and_call_is_vacant_path([3,0], [5,0], [[2,2]]).should be_true }
+    it { stub_methods_and_call_is_vacant_path([0,0], [0,2], [[0,2]]).should be_false }
   end
 
   # Straight paths
   context '#is_straight_path?' do
-    it "should recognize a non-straight path" do
-      dummy.stub(:is_straight_path?).with([1,1], [2,3]).and_return(false)
-      dummy.stub(:is_perpendicular_path?).with([1,1], [2,3]).and_return(false)
-      dummy.is_straight_path?([1,1], [2,3]).should be_false 
+    def stub_methods_and_call_is_straight_path(from, to, stub_return)
+      dummy.stub_chain(:is_diagonal_path?, :is_perpendicular_path?).with(from, to).and_return(stub_return)
+      dummy.is_straight_path?(from, to)
     end
-    it "should recognize a straight perpendicular path" do
-      dummy.stub(:is_straight_path?).with([1,1], [1,3]).and_return(true)
-      dummy.stub(:is_perpendicular_path?).with([1,1], [1,3]).and_return(true)
-      dummy.is_straight_path?([1,1], [1,3]).should be_true
-    end
-    it "should recognize a straight diagonal path" do
-      dummy.stub(:is_straight_path?).with([1,1], [3,3]).and_return(true)
-      dummy.stub(:is_perpendicular_path?).with([1,1], [3,3]).and_return(true)
-      dummy.is_straight_path?([1,1], [3,3]).should be_true
-    end
+    
+    it { stub_methods_and_call_is_straight_path([1,1], [2,3], false).should be_true }
+    it { stub_methods_and_call_is_straight_path([1,1], [1,3], true).should be_true }
+    it { stub_methods_and_call_is_straight_path([1,1], [3,3], true).should be_true }
   end
 
   # All piece movements
 
   # Valid pawn movements
   context '#is_valid_pawn_distance?' do
-    it "should recognize an invalid pawn path (not straight)" do 
-      dummy.stub(:total_dist).with([1,2], [3,2]).and_return(-1)
-      game.board.stub(:piece_has_moved?).with([1,2]).and_return(true)
-      dummy.is_valid_pawn_distance?([1,2], [3,2], game.board).should be_false
+    def stub_methods_and_call_is_straight_path(from, to, stub_return_1, stub_return_2)
+      dummy.stub(:total_dist).with(from, to).and_return(stub_return_1)
+      game.board.stub(:piece_has_moved?).with(from).and_return(stub_return_2)
+      dummy.is_valid_pawn_distance?(from, to, game.board)
     end
-    it "should recognize an invalid path distance of 2 for a pawn that has already moved" do
-      dummy.stub(:total_dist).with([1,1], [3,1]).and_return(2)
-      game.board.stub(:piece_has_moved?).with([1,1]).and_return(true)
-      dummy.is_valid_pawn_distance?([1,1], [3,1], game.board).should be_false
-    end
-    it "should recognize a valid pawn path of distance 1 for a pawn that has already moved" do
-      dummy.stub(:total_dist).with([1,1], [2,1]).and_return(2)
-      game.board.stub(:piece_has_moved?).with([1,1]).and_return(false)
-      dummy.is_valid_pawn_distance?([1,1],[2,1], game.board).should be_true
-    end
-    it "should recognize a valid path distance of 2 for a pawn that has not already moved" do
-      dummy.stub(:total_dist).with([1,1], [3,1]).and_return(2)
-      game.board.stub(:piece_has_moved?).with([1,1]).and_return(false)
-      dummy.is_valid_pawn_distance?([1,1], [3,1], game.board).should be_true
-    end 
+    
+    it { stub_methods_and_call_is_straight_path([1,2], [3,2], -1, false).should be_false } 
+    it { stub_methods_and_call_is_straight_path([1,2], [3,1], 2, true).should be_false } 
+    it { stub_methods_and_call_is_straight_path([1,2], [2,1], 2, false).should be_true }
+    it { stub_methods_and_call_is_straight_path([1,1], [3,1], 2, false).should be_true } 
   end   
 
   context '#is_valid_path?' do
     # Pawn path
     it "should recognize an invalid path for a pawn" do
-      game.board.stub(:piece_at?).with(6,7).and_return(true)
+      game.board.stub(:piece_at?).with([6,7]).and_return(true)
       game.stub(:is_diagonal_path).with([1,5], [6,7]).and_return(false)
       dummy.is_valid_path?([1,5], [6,7], game.board, FIRST_PLAYER).should be_false
     end
@@ -163,8 +136,8 @@ describe MoveValidator do
     # Rook path
     it "should recognize an invalid path for a rook" do
       rook_location = PIECES[:back_row].index('rook')
-      game.stub(:is_perpendicular_path?).with([0,rook_location],[1,rook_location]).and_return(true)
-      game.stub(:is_vacant_path?).with([0, rook_location], [1, rook_location], game.board).and_return(false)
+      game.stub_chain(:is_perpendicular_path?, :is_vacant_path?).
+        with([0,rook_location],[1,rook_location], game.board).and_return(false)
       dummy.is_valid_path?([0, rook_location], [1, rook_location], game.board, FIRST_PLAYER ).should be_false
     end
 
@@ -192,8 +165,7 @@ describe MoveValidator do
     # King path
     it "should recognize an invalid path for a king" do
       king_location = PIECES[:back_row].index('king')
-      game.board.stub(:is_straight_path?).with([0, king_location], [3, king_location]).and_return(true)
-      game.board.stub(:total_dist).with([0, king_location], [3, king_location]).and_return(3)
+      game.board.stub_chain(:is_straight_path?, :total_dist).with([0, king_location], [3, king_location]).and_return(3)
       dummy.is_valid_path?([0, king_location], [3, king_location], game.board, FIRST_PLAYER ).should be_false
     end
   end
@@ -205,11 +177,12 @@ describe MoveValidator do
 
   # Piece captures
   context '#can_capture_piece?' do
-    it "should recognize a player/move that can capture the given piece" do
-      game.board.stub(:piece_at?).with(FIRST_PLAYER[:owns][:front_row], (YMAX/2).round).and_return(true)
-      game.board.stub(:piece_owned_by?).with(FIRST_PLAYER, [FIRST_PLAYER[:owns][:front_row]], game.board).and_return(false)
-      dummy.can_capture_piece?([FIRST_PLAYER[:owns][:front_row], (YMAX / 2).round], game.board, SECOND_PLAYER).should be_true
-    end 
+    def stub_methods_and_call_can_capture_piece(capturer, captured, x, y, stub_return)
+      game.board.stub_chain(:piece_at?, :piece_owned_by?).with(capturer, x, game.board).and_return(stub_return)
+      dummy.can_capture_piece?([x, y], game.board, captured)
+    end
+      
+    it { stub_methods_and_call_can_capture_piece(FIRST_PLAYER, SECOND_PLAYER, FIRST_PLAYER[:owns][:front_row], (YMAX / 2).round, false).should be_true }
   end
 
   context '#piece_owned_by?' do
@@ -218,26 +191,15 @@ describe MoveValidator do
 
   # Getting errors for move (if any)
   context '#get_errors_for_move' do
-    it "should recognize a valid move" do
-      game.board.stub(:piece_at?).with(1,1).and_return(true)
-      game.board.stub(:is_on_board?).with([2,1]).and_return(true)
-      game.stub(:piece_owned_by?).with(FIRST_PLAYER, [1,1], game.board).and_return(true)
-      game.stub(:is_valid_path?).with([1,1], [2,1], game.board, FIRST_PLAYER).and_return(true)
-      game.board.stub(:piece_at?).with(2, 1).and_return(false)
-      dummy.get_errors_for_move([1,1], [2,1], game.board, FIRST_PLAYER).should be_nil
-    end  
-    it "should recognize an invalid path" do 
-      game.board.stub(:piece_at?).with(0,0).and_return(true)
-      game.board.stub(:is_on_board?).with([7,7]).and_return(true)
-      game.stub(:piece_owned_by?).with(FIRST_PLAYER, [1,1], game.board).and_return(true)
-      game.stub(:is_valid_path?).with([1,1], [7,7], game.board, FIRST_PLAYER).and_return(false)
-      dummy.get_errors_for_move([0,0], [7,7], game.board, FIRST_PLAYER).should be_kind_of(String)
+    def stub_methods_and_call_get_errors_for_move(from, to, player, stub_return_1, stub_return_2, stub_return_3 = nil)
+      game.board.stub_chain(:piece_at?, :is_on_board?).with(to).and_return(stub_return_1)
+      game.stub_chain(:piece_owned_by?, :is_valid_path?).with(from, to, game.board, player).and_return(stub_return_2)
+      game.board.stub(:piece_at?).with(to).and_return(stub_return_3) unless stub_return_3.nil?
+      dummy.get_errors_for_move(from, to, game.board, player)
     end
-    it "should recognize an attempt to move a piece that is not owned by current_player" do
-      game.board.stub(:piece_at?).with(0,0).and_return(true)
-      game.board.stub(:is_on_board?).with([7,7]).and_return(true)
-      game.stub(:piece_owned_by?).with(SECOND_PLAYER, [1,1], game.board).and_return(false)
-      dummy.get_errors_for_move([0,0], [7,7], game.board, SECOND_PLAYER).should be_a_kind_of(String)
-    end
+    
+    it { stub_methods_and_call_get_errors_for_move([1,1], [2,1], FIRST_PLAYER, true, true, false).should be_nil } 
+    it { stub_methods_and_call_get_errors_for_move([XMAX,YMAX], [0,0], FIRST_PLAYER, true, false).should be_a_kind_of(String) } 
+    it { stub_methods_and_call_get_errors_for_move([0,0], [XMAX,YMAX], FIRST_PLAYER, true, false).should be_a_kind_of(String) } 
   end
 end

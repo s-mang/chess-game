@@ -23,7 +23,34 @@ class Board < Game
     @pieces = initialize_pieces
   end
   
-  # SETTING UP BOARD
+  def piece_has_moved?(from)
+    piece = piece_at(from)
+    return (piece.is_a?(Piece) && piece.has_moved?)
+  end
+  
+  def piece_at(loc)
+    @pieces[loc[0]][loc[1]]
+  end
+  
+  def piece_at?(loc)
+    return (piece_at(loc) != 0)
+  end
+  
+  def set_piece(loc, piece)
+    @pieces[loc[0]][loc[1]] = piece
+  end
+ 
+  def set_piece_as_moved(piece)
+    piece.set_as_moved unless piece.zero?
+  end
+  
+  def set_piece_as_unmoved(piece)
+    piece.set_as_unmoved unless piece.zero?
+  end
+  
+  
+  private
+  
   def initialize_pieces
     no_pieces_2D_array = Array.new((XMAX - 4), Array.new(YMAX, 0))
     p1_front_row = new_front_row(PIECES[:front_row_piece], FIRST_PLAYER[:color])
@@ -33,35 +60,12 @@ class Board < Game
     return [p1_back_row, p1_front_row].concat(no_pieces_2D_array).concat([p2_front_row, p2_back_row])
   end
   
-  # METHODS CALLED BY INITIALIZE:
   def new_front_row(piece_name, color)
     return Array.new(YMAX, Piece.new(piece_name, color))
   end
   
-  def new_back_row(piece_names_array, color)
-    return (Array.new(YMAX) { |index| Piece.new(piece_names_array[index], color) })
+  def new_back_row(piece_names, color)
+    return (Array.new(YMAX) { |index| Piece.new(piece_names[index], color) })
   end
-  
-  # MOVE/CHECK-MOVED/UNMOVE PIECE
-  def piece_has_moved?(from)
-    piece = @pieces[from[0]][from[1]]
-    return (piece.is_a?(Piece) && piece.has_moved)
-  end
-  
-  def move_piece_at(from)
-    piece = @pieces[from[0]][from[1]]
-    piece.move unless piece.zero?
-  end
-  
-  def unmove_piece_at(from)
-    piece = @pieces[from[0]][from[1]]
-    piece.unmove unless piece.zero?
-  end
-    
    
-  # CHECK FOR PIECE AT POSITION (X,Y)
-  def piece_at?(x, y)
-    return @pieces[x][y] != 0
-  end
-  
 end

@@ -20,6 +20,6 @@ module AllBe
   end 
 end
 
-Rspec.configure do |config|
+RSpec.configure do |config|
   config.include AllBe
 end

@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
-gem "activerecord"
-
-gem "rspec"
+group :test do
+  gem "rspec"
+end
