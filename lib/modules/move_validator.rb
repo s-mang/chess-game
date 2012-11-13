@@ -52,13 +52,9 @@ module MoveValidator
   end
 
   def is_vacant_path?(from, to, board)
-    if board.piece_at?(to)
-      return false
-    else 
-      get_path_squares(from, to).each do |coord|
-        if board.piece_at?(coord)
-          return false
-        end
+    get_path_squares(from, to).each do |coord|
+      if board.piece_at?(coord)
+        return false
       end
     end
     return true 
