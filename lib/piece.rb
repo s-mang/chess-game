@@ -15,6 +15,10 @@ class Piece < Board
     return false
   end
   
+  def nonzero?
+    return true
+  end
+  
   # TO MARK PIECE AS MOVED/UNMOVED
   def set_as_moved
     @has_moved = true

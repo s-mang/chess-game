@@ -27,7 +27,7 @@ module Constants
   # Players and their color
   # Colors: String
   # Sides: Hash
-  FIRST_PLAYER = { :color => "white", :owns => {:back_row =>0, :front_row => 1} }
-  SECOND_PLAYER = { :color => "black", :owns => {:back_row => 7, :front_row => 6} }
+  FIRST_PLAYER = { :color => "white", :owns => {:back_row =>0, :front_row => 1}, :downcase => "first_player" }
+  SECOND_PLAYER = { :color => "black", :owns => {:back_row => 7, :front_row => 6}, :downcase => "second_player" }
   
 end

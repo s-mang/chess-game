@@ -22,12 +22,12 @@ class Game
   
   # CAPTURES & RETURNS CAPTURED PIECE BY CURRENT_PLAYER
   def make_captures(to)
-    unless (piece = @board.piece_at(to)).zero? 
-      if (@current_player == FIRST_PLAYER)
+    unless (piece = @board.piece_at(to)).zero?
+      if @current_player == FIRST_PLAYER
         @first_player_captured_pieces << piece
       else
         @second_player_captured_pieces << piece
-      end
+      end    
     end
     return piece
   end
@@ -41,12 +41,12 @@ class Game
   # CONTROLLS MOVE-MAKING & CHECKS FOR GAME OVER
   def make_move(from, to)
     error_messages = get_errors_for_move(from, to, @board, @current_player)
-    if !error_messages.nil?
+    if error_messages.is_a?(String)
       puts error_messages
       return false
     else
       piece = make_captures(to)
-      if !piece.zero? && (piece.name == "king")
+      if piece.nonzero? && (piece.name == "king")
         @game_over = true
       end
       moving_piece = @board.piece_at(from)

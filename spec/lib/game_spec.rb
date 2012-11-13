@@ -34,8 +34,7 @@ describe Game do
         to change { pawn.has_moved? }.from(false).to(true) }
            
     ## END GAME?
-    it { expect { stub_methods_and_call_make_move([1,1], [SECOND_PLAYER[:owns][:back_row], PIECES[:back_row].index("king")], FIRST_PLAYER) }.
-        to change { game.game_over? }.from(false).to(true) }
+    it { expect { stub_methods_and_call_make_move([1,1], [SECOND_PLAYER[:owns][:back_row], PIECES[:back_row].index("king")], FIRST_PLAYER) }.to change { game.game_over? }.from(false).to(true) }
   end
   
   ## UPDATE BOARD

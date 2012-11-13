@@ -20,7 +20,7 @@ module MoveValidator
   
   # VALIDITY CHECKERS FOR PATH
   def is_non_stationary_path?(from, to)
-    return !((from[0] == to[0]) && (from[1] == to[1]))
+    return ((from[0] != to[0]) || (from[1] != to[1]))
   end
 
   def is_valid_pawn_distance?(from, to, board)
@@ -28,11 +28,7 @@ module MoveValidator
   end
 
   def is_forward_path?(from, to, player)
-    if player[:owns][:back_row].zero? 
-      return (from[0] < to[0])
-    else
-      return (from[0] > to[0])
-    end
+    player[:owns][:back_row].zero? ? (from[0] < to[0]) : (from[0] > to[0])
   end
 
   def is_perpendicular_path?(from, to)
@@ -53,9 +49,7 @@ module MoveValidator
 
   def is_vacant_path?(from, to, board)
     get_path_squares(from, to).each do |coord|
-      if board.piece_at?(coord)
-        return false
-      end
+      return false if board.piece_at?(coord)
     end
     return true 
   end
@@ -122,10 +116,5 @@ module MoveValidator
     return "That piece cannot move to #{to[0]}, #{to[1]}" unless is_valid_path?(from, to, board, current_player)
     return "You cannot capture the piece at #{to[0]}, #{to[1]}" unless !board.piece_at?(to) || can_capture_piece?(to, board, current_player)
   end
-  
-  
-  
-  
-  
   
 end
