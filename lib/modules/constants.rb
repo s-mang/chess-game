@@ -15,11 +15,6 @@
 
 
 module Constants  
-  # For rspec configuration
-  def help
-    :available
-  end
-  
   # Board pieces
   PIECES = { :back_row => ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook"],
              :front_row_piece => "pawn" }
