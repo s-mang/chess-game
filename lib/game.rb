@@ -55,4 +55,36 @@ class Game
       return true
     end
   end
+  
+  # CONTROLS VALIDITY CHECK OF MOVE/PATH
+  def is_valid_path?(from, to, board, current_player)
+    case board.piece_at(from).name
+    when "king" 
+      return (is_straight_path?(from, to) && (total_dist(from, to) == 1))
+    when "queen"
+      return (is_straight_path?(from, to) && is_vacant_path?(from, to, board))
+    when "bishop"
+      return (is_diagonal_path?(from, to) && is_vacant_path?(from, to, board))
+    when "knight" 
+      return is_L_path?(from, to)
+    when "rook"
+      return (is_perpendicular_path?(from, to) && is_vacant_path?(from, to, board))
+    when "pawn"    
+      if board.piece_at?(to)
+        return (is_diagonal_path?(from, to) && (total_dist(from, to) == 1))
+      else
+        return (is_perpendicular_path?(from, to) && is_forward_path?(from, to, current_player) && is_valid_pawn_distance?(from, to, board))
+      end
+    end
+    return false # if called with another piece name
+  end
+
+  # RETURNS THE ERROR MESSAGES FOR MOVE (OR NIL IF NO ERRORS)
+  def get_errors_for_move(from, to, board, current_player)   
+    return "No piece at #{from[0]}, #{from[1]}" unless (board.piece_at?(from))
+    return "That move is off the board." unless is_on_board?(to)
+    return "That is not your piece to move." unless piece_owned_by?(current_player, from, board)
+    return "That piece cannot move to #{to[0]}, #{to[1]}" unless is_valid_path?(from, to, board, current_player)
+    return "You cannot capture the piece at #{to[0]}, #{to[1]}" unless !board.piece_at?(to) || can_capture_piece?(to, board, current_player)
+  end
 end

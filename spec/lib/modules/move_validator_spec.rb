@@ -130,7 +130,7 @@ describe MoveValidator do
     it "should recognize an invalid path for a pawn" do
       game.board.stub(:piece_at?).with([6,7]).and_return(true)
       dummy.stub(:is_diagonal_path).with([1,5], [6,7]).and_return(false)
-      dummy.is_valid_path?([1,5], [6,7], game.board, FIRST_PLAYER).should be_false
+      game.is_valid_path?([1,5], [6,7], game.board, FIRST_PLAYER).should be_false
     end
 
     # Rook path
@@ -138,35 +138,35 @@ describe MoveValidator do
       rook_location = PIECES[:back_row].index('rook')
       dummy.stub(:is_perpendicular_path?).with([0,rook_location], [1, rook_location]).and_return(true)
       dummy.stub(:is_vacant_path?).with([0,rook_location],[1,rook_location], game.board).and_return(false)
-      dummy.is_valid_path?([0, rook_location], [1, rook_location], game.board, FIRST_PLAYER ).should be_false
+      game.is_valid_path?([0, rook_location], [1, rook_location], game.board, FIRST_PLAYER ).should be_true
     end
 
     # Knight path
     it "should recognize an invalid path for a knight" do
       knight_location = PIECES[:back_row].index('knight')
       dummy.stub(:is_L_path).with([0,knight_location], [1, knight_location]).and_return(false)
-      dummy.is_valid_path?([0, knight_location], [1, knight_location], game.board, FIRST_PLAYER ).should be_false
+      game.is_valid_path?([0, knight_location], [1, knight_location], game.board, FIRST_PLAYER ).should be_false
     end
 
     # Bishop path
     it "should recognize an invalid path for a bishop" do
       bishop_location = PIECES[:back_row].index('bishop')
       game.board.stub(:is_diagonal_path?).with([0, bishop_location], [1, bishop_location]).and_return(false)
-      dummy.is_valid_path?([0, bishop_location], [1, bishop_location], game.board, FIRST_PLAYER ).should be_false
+      game.is_valid_path?([0, bishop_location], [1, bishop_location], game.board, FIRST_PLAYER ).should be_false
     end
 
     # Queen path
     it  "should recognize an invalid path for a queen" do
       queen_location = PIECES[:back_row].index('queen')
       game.board.stub(:is_straight_path).with([0,queen_location], [3, queen_location + 1]).and_return(false)
-      dummy.is_valid_path?([0, queen_location], [3, (queen_location + 1)], game.board, FIRST_PLAYER ).should be_false
+      game.is_valid_path?([0, queen_location], [3, (queen_location + 1)], game.board, FIRST_PLAYER ).should be_false
     end
 
     # King path
     it "should recognize an invalid path for a king" do
       king_location = PIECES[:back_row].index('king')
       game.board.stub_chain(:is_straight_path?, :total_dist).with([0, king_location], [3, king_location]).and_return(3)
-      dummy.is_valid_path?([0, king_location], [3, king_location], game.board, FIRST_PLAYER ).should be_false
+      game.is_valid_path?([0, king_location], [3, king_location], game.board, FIRST_PLAYER ).should be_false
     end
   end
 
@@ -195,7 +195,7 @@ describe MoveValidator do
       game.board.stub_chain(:piece_at?, :is_on_board?).with(to).and_return(stub_return_1)
       game.stub_chain(:piece_owned_by?, :is_valid_path?).with(from, to, game.board, player).and_return(stub_return_2)
       game.board.stub(:piece_at?).with(to).and_return(stub_return_3) unless stub_return_3.nil?
-      dummy.get_errors_for_move(from, to, game.board, player)
+      game.get_errors_for_move(from, to, game.board, player)
     end
     
     it { stub_methods_and_call_get_errors_for_move([1,1], [2,1], FIRST_PLAYER, true, true, false).should be_nil } 

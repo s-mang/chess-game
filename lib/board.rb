@@ -13,10 +13,11 @@
 #                            #
 ##############################
 
+require File.expand_path('../piece.rb', __FILE__)
 require File.expand_path('../game.rb', __FILE__)
 
-class Board < Game
-  include Constants
+class Board
+  include Game::Constants
   attr_accessor :pieces
   
   def initialize

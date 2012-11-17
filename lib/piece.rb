@@ -1,9 +1,7 @@
-require File.expand_path('../board.rb', __FILE__)
-
-class Piece < Board
+class Piece
   attr_accessor :has_moved
   attr_reader :name, :color
-  
+    
   def initialize(name, color, has_moved = nil)
     @name = name
     @color = color
