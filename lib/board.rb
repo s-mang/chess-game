@@ -26,7 +26,7 @@ class Board
   
   def piece_has_moved?(from)
     piece = piece_at(from)
-    return (piece.is_a?(Piece) && piece.has_moved?)
+    (piece.is_a?(Piece) && piece.has_moved?)
   end
   
   def piece_at(loc)
@@ -34,19 +34,17 @@ class Board
   end
   
   def piece_at?(loc)
-    return (piece_at(loc) != 0)
+    piece_at(loc).nonzero?
   end
   
   def set_piece(loc, piece)
     @pieces[loc[0]][loc[1]] = piece
   end
  
-  def set_piece_as_moved(piece)
-    piece.set_as_moved unless piece.zero?
-  end
-  
-  def set_piece_as_unmoved(piece)
-    piece.set_as_unmoved unless piece.zero?
+  [:moved, :unmoved].each do |state|
+    define_method "set_piece_as_#{state}" do |piece|
+      piece.send("set_as_#{state}") unless piece.zero?
+    end
   end
   
   
@@ -58,15 +56,15 @@ class Board
     p1_back_row = new_back_row(PIECES[:back_row], FIRST_PLAYER[:color])
     p2_front_row = new_front_row(PIECES[:front_row_piece], SECOND_PLAYER[:color])
     p2_back_row = new_back_row(PIECES[:back_row], SECOND_PLAYER[:color])
-    return [p1_back_row, p1_front_row].concat(no_pieces_2D_array).concat([p2_front_row, p2_back_row])
+    [p1_back_row, p1_front_row].concat(no_pieces_2D_array).concat([p2_front_row, p2_back_row])
   end
   
   def new_front_row(piece_name, color)
-    return Array.new(YMAX, Piece.new(piece_name, color))
+    Array.new(YMAX, Piece.new(piece_name, color))
   end
   
   def new_back_row(piece_names, color)
-    return (Array.new(YMAX) { |index| Piece.new(piece_names[index], color) })
+    (Array.new(YMAX) { |index| Piece.new(piece_names[index], color) })
   end
    
 end
